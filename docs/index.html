@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pack Light, CarryOn</title>
+<meta name="description" content="CarryOn: an object-oriented context runtime for long-horizon agents.">
+<meta property="og:title" content="Pack Light, CarryOn: Building Object-Oriented Context for Long-Horizon Agents">
+<meta property="og:description" content="Keeping AI agents on track in long-horizon tasks: context built around reusable task objects, not the history that produced them.">
+<meta property="og:image" content="https://ethannju.github.io/carryon/static/images/video-poster.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f9f7f3; --dot: #dcd8cf; --ink: #21242f; --pencil: #6b6f79; --faint: #9a9da5;
+    --blue: #2d6bb1; --blue-soft: #e4ecf6; --orange: #e06b26; --hi: #ffe99d; --panel: #eef0f1;
+    --hand: "Kalam", "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive;
+    --sketch: 255px 12px 225px 14px / 14px 225px 12px 255px;
+    --sketch-big: 22px 6px 18px 8px / 8px 18px 6px 22px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--ink); font: 300 19px/1.6 var(--hand);
+    background-color: var(--paper);
+    background-image: radial-gradient(var(--dot) 1px, transparent 1.3px);
+    background-size: 26px 26px;
+  }
+  a { color: var(--blue); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-inline: 22px; }
+  .corner { display: flex; justify-content: space-between; color: var(--faint); font-size: 16px; padding-top: 22px; }
+  .corner a { color: var(--faint); text-decoration: none; }
+
+  /* hero */
+  .hero { display: grid; grid-template-columns: 0.9fr 1.1fr; align-items: center; gap: 24px; padding: 34px 0 10px; }
+  .tag { font-weight: 700; font-size: clamp(50px, 7.4vw, 86px); line-height: 1.05; white-space: nowrap; margin: 0; letter-spacing: -0.5px; }
+  .tag .co { color: var(--blue); position: relative; display: inline-block; }
+  .tag .co svg { position: absolute; left: -2%; bottom: -0.12em; width: 104%; height: 0.32em; overflow: visible; }
+  .sub { font-size: 21px; color: var(--pencil); margin: 26px 0 0; }
+  .hero-art { width: 100%; max-width: 580px; justify-self: center; }
+
+  .paper-title { text-align: center; margin: 44px 0 0; }
+  h1 { font-weight: 700; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.25; margin: 0 0 14px; }
+  .authors { font-size: 22px; font-weight: 400; margin: 0; }
+  .authors a { color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .authors a:hover { text-decoration: underline wavy var(--blue) 1px; text-underline-offset: 5px; }
+  .affil { color: var(--pencil); margin: 2px 0 0; font-size: 18px; }
+  .corr { color: var(--faint); font-size: 15px; margin: 0; }
+
+  .buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin: 26px 0 0; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px; padding: 8px 22px 6px; font: 700 20px var(--hand);
+    color: var(--ink); text-decoration: none; background: #fff; border: 2px solid var(--ink);
+    border-radius: var(--sketch); box-shadow: 3px 3px 0 var(--ink); transition: transform .12s, box-shadow .12s;
+  }
+  .btn:nth-child(2) { transform: rotate(-0.8deg); }
+  .btn:nth-child(3) { transform: rotate(0.7deg); }
+  .btn:hover { transform: translate(-1px, -2px) rotate(-0.5deg); box-shadow: 5px 5px 0 var(--ink); }
+  .btn svg { width: 20px; height: 20px; }
+  .btn.soon { color: var(--faint); border-style: dashed; border-color: var(--faint); box-shadow: none; cursor: default; background: transparent; }
+  .btn.soon:hover { transform: none; }
+  .btn small { font-weight: 300; font-size: 15px; }
+
+  /* sections */
+  section { padding: 56px 0 8px; }
+  .step { color: var(--faint); font-size: 16px; margin: 0 0 2px; }
+  h2 { font-weight: 700; font-size: clamp(30px, 4.2vw, 42px); line-height: 1.2; margin: 0 0 18px; }
+  .hl { background: linear-gradient(transparent 52%, var(--hi) 52%, var(--hi) 90%, transparent 90%); padding: 0 4px; border-radius: 3px; }
+  .blue { color: var(--blue); } .orange { color: var(--orange); }
+  .lead { font-size: 21px; max-width: 840px; margin: 0 0 22px; }
+  .lead b { font-weight: 700; }
+
+  .sheet { background: #fff; border: 2px solid var(--ink); border-radius: var(--sketch-big); padding: 14px; box-shadow: 4px 4px 0 rgba(33,36,47,.12); }
+  .sheet img { display: block; width: 100%; height: auto; }
+  .sheet + .sheet, .sheet + .note + .sheet { margin-top: 30px; }
+  .note { color: var(--pencil); font-size: 17px; line-height: 1.5; margin: 12px 4px 0; }
+  .note b { color: var(--ink); font-weight: 400; }
+
+  .video-frame { border: 2.5px solid var(--ink); border-radius: var(--sketch-big); padding: 8px; background: #fff; box-shadow: 5px 5px 0 var(--ink); }
+  video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 4px; background: var(--paper); }
+
+
+  /* three things */
+  .things { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 4px 0 28px; }
+  .thing { border: 2px solid var(--blue); border-radius: var(--sketch); padding: 14px 16px 12px; background: rgba(255,255,255,.7); }
+  .thing.ec { border-color: var(--orange); }
+  .thing.tail { border: 2px dashed var(--faint); }
+  .thing h3 { margin: 0; font-size: 22px; font-weight: 700; display: flex; gap: 10px; align-items: baseline; }
+  .thing h3 .n { display: inline-grid; place-items: center; width: 26px; height: 26px; border: 1.8px solid currentColor; border-radius: 50%; font-size: 15px; flex: none; }
+  .thing.cc h3 { color: var(--blue); } .thing.ec h3 { color: var(--orange); } .thing.tail h3 { color: var(--pencil); }
+  .thing p { margin: 6px 0 0; font-size: 17px; line-height: 1.45; color: var(--pencil); }
+  .thing p i { color: var(--faint); }
+
+  /* results chart */
+  .bench { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-bottom: 30px; }
+  .panel { border-left: 2px solid var(--dot); padding: 0 6px 0 22px; }
+  .panel:first-child { border-left: 0; padding-left: 0; }
+  .panel h3 { margin: 0; font-size: 26px; font-weight: 400; }
+  .panel .what { color: var(--faint); font-size: 15px; margin: -4px 0 10px; }
+  .chart { display: flex; align-items: flex-end; gap: 26px; }
+  .bars { display: flex; align-items: flex-end; gap: 22px; height: 220px; border-bottom: 2px solid var(--ink); padding: 0 8px; }
+  .bar { width: 58px; position: relative; border: 2px solid var(--ink); border-bottom: 0; border-radius: 5px 3px 0 0;
+         background: repeating-linear-gradient(-45deg, #fff 0 5px, #d9dbe0 5px 6.5px); }
+  .bar.co { border-color: var(--blue); background: repeating-linear-gradient(-45deg, #fff 0 5px, #9bb9de 5px 6.5px); }
+  .bar span { position: absolute; top: -32px; left: 50%; transform: translateX(-50%); font-size: 21px; font-weight: 400; }
+  .bar.co span { color: var(--blue); font-weight: 700; }
+  .xlab { display: flex; gap: 22px; padding: 2px 8px 0; font-size: 14px; color: var(--faint); }
+  .xlab div { width: 58px; text-align: center; line-height: 1.2; }
+  .xlab div + div { color: var(--blue); }
+  .calls { padding-bottom: 6px; }
+  .calls .gain { font-weight: 700; font-size: 22px; color: var(--blue); }
+  .calls .gain .hl { padding: 0 6px; }
+  .calls p { margin: 12px 0 0; font-size: 21px; color: var(--blue); line-height: 1.1; }
+  .calls p small { display: block; font-size: 14px; color: var(--faint); margin-top: 3px; }
+  .fine { color: var(--faint); font-size: 15px; margin: 6px 0 0; }
+
+  /* takeaway */
+  .takeaway { display: grid; grid-template-columns: 1.5fr 1fr; align-items: end; gap: 20px; padding: 70px 0 20px; }
+  .takeaway p.big { font-weight: 700; font-size: clamp(28px, 4vw, 42px); line-height: 1.3; margin: 0; }
+  .takeaway p.big + p.big { margin-top: 10px; font-weight: 400; }
+  .packed { width: 100%; max-width: 300px; justify-self: center; }
+
+  footer { border-top: 2px solid var(--ink); margin-top: 40px; padding: 16px 0 44px; color: var(--faint); font-size: 16px;
+           display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+  footer .brand { color: var(--blue); font-weight: 700; font-size: 26px; line-height: 1; }
+
+  @media (max-width: 760px) {
+    body { font-size: 18px; }
+    .hero, .takeaway { grid-template-columns: 1fr; }
+    .hero-art { max-width: 420px; }
+    .things, .bench { grid-template-columns: 1fr; }
+    .panel { border-left: 0; padding-left: 0; border-top: 2px solid var(--dot); padding-top: 18px; }
+    .panel:first-child { border-top: 0; padding-top: 0; }
+    .chart { gap: 16px; } .bars { gap: 14px; } .bar, .xlab div { width: 48px; } .xlab { gap: 14px; }
+    .packed { max-width: 200px; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#cfd2d8" stroke-width="1.3"/>
+    </pattern>
+    <pattern id="hatchBrown" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#e2c9a8" stroke-width="1.3"/>
+    </pattern>
+    <pattern id="hatchBlue" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#a9c3e4" stroke-width="1.3"/>
+    </pattern>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <div class="corner"><span>CarryOn · project page</span><a href="#video">▶ watch the overview</a></div>
+
+  <header class="hero">
+    <div>
+      <p class="tag">Pack light,<br><span class="co">CarryOn.<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 13 C 70 6, 150 5, 297 9" fill="none" stroke="#2d6bb1" stroke-width="4" stroke-linecap="round"/></svg></span></p>
+      <p class="sub">Keeping AI agents on track in long-horizon tasks</p>
+    </div>
+    <!-- an agent dragging its whole history, folded into one light carry-on (after the video cover) -->
+    <svg class="hero-art" viewBox="0 0 640 340" fill="none" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A robot buried under a messy pile of boxes labeled with step ranges, then after a fold a smiling robot with one small carry-on suitcase">
+      <g stroke-width="2">
+        <g stroke="#6b6f79" fill="url(#hatch)">
+          <rect x="12" y="250" width="86" height="38" rx="2" transform="rotate(-2 55 269)"/>
+          <rect x="30" y="211" width="76" height="36" rx="2" transform="rotate(-3 68 229)"/>
+          <rect x="122" y="168" width="64" height="32" rx="2" transform="rotate(3 154 184)"/>
+          <rect x="120" y="136" width="62" height="30" rx="2" transform="rotate(-6 151 151)"/>
+          <rect x="68" y="56" width="62" height="28" rx="2" transform="rotate(-10 99 70)"/>
+          <rect x="94" y="16" width="56" height="26" rx="2" transform="rotate(-12 122 29)"/>
+        </g>
+        <g stroke="#a8743f" fill="url(#hatchBrown)">
+          <rect x="96" y="246" width="80" height="42" rx="2" transform="rotate(2 136 267)"/>
+          <rect x="100" y="206" width="70" height="36" rx="2" transform="rotate(2 135 224)"/>
+          <rect x="64" y="132" width="62" height="32" rx="2" transform="rotate(-4 95 148)"/>
+          <rect x="102" y="84" width="54" height="28" rx="2" transform="rotate(-6 129 98)"/>
+        </g>
+        <g stroke="#6b6f79" fill="url(#hatch)">
+          <ellipse cx="80" cy="186" rx="32" ry="15"/><path d="M68 172 q12 -12 24 0"/>
+          <ellipse cx="114" cy="124" rx="26" ry="13"/><path d="M104 112 q10 -10 20 0"/>
+          <ellipse cx="146" cy="50" rx="25" ry="12"/><path d="M136 39 q10 -10 20 0"/>
+          <ellipse cx="166" cy="270" rx="18" ry="11"/>
+        </g>
+        <g stroke="#6b6f79" fill="#fff" stroke-width="1.6">
+          <rect x="36" y="80" width="30" height="24" transform="rotate(-12 51 92)"/><path d="M42 88 h16 M42 95 h12" transform="rotate(-12 51 92)"/>
+          <rect x="50" y="118" width="30" height="24" transform="rotate(8 65 130)"/><path d="M56 126 h16 M56 133 h12" transform="rotate(8 65 130)"/>
+          <rect x="148" y="56" width="28" height="22" transform="rotate(14 162 67)"/><path d="M153 63 h15 M153 70 h10" transform="rotate(14 162 67)"/>
+          <rect x="140" y="148" width="28" height="22" transform="rotate(-10 154 159)"/><path d="M145 155 h15 M145 162 h10" transform="rotate(-10 154 159)"/>
+          <rect x="150" y="214" width="26" height="22" transform="rotate(10 163 225)"/><path d="M155 221 h14 M155 228 h10" transform="rotate(10 163 225)"/>
+        </g>
+        <g font-family="Kalam, cursive" font-size="12" fill="#21242f" stroke="none" text-anchor="middle">
+          <text x="55" y="273" transform="rotate(-2 55 269)">1–18</text>
+          <text x="68" y="233" transform="rotate(-3 68 229)">37–54</text>
+          <text x="80" y="190">55–72</text>
+          <text x="154" y="188" transform="rotate(3 154 184)">73–90</text>
+          <text x="151" y="155" transform="rotate(-6 151 151)">91–108</text>
+          <text x="114" y="128">109–126</text>
+          <text x="99" y="74" transform="rotate(-10 99 70)">127–144</text>
+          <text x="146" y="54">145–162</text>
+          <text x="122" y="33" transform="rotate(-12 122 29)">181–198</text>
+          <text x="166" y="274">19–36</text>
+        </g>
+      </g>
+      <!-- overloaded robot -->
+      <g stroke="#21242f" stroke-width="2.4">
+        <path d="M216 112 v-14"/><circle cx="216" cy="92" r="7" fill="#e06b26" stroke="#e06b26"/>
+        <rect x="176" y="112" width="88" height="70" rx="11" fill="url(#hatchBlue)"/>
+        <path d="M196 136 l12 7 l-12 7 M244 136 l-12 7 l12 7"/>
+        <path d="M204 166 q4 -6 8 0 t8 0 t8 0 t8 0"/>
+        <rect x="190" y="190" width="70" height="80" rx="9" fill="url(#hatchBlue)"/>
+        <circle cx="225" cy="232" r="6" stroke="#2d6bb1" stroke-width="2"/>
+        <path d="M190 210 c -12 8 -16 22 -18 40"/><path d="M260 210 c 14 10 18 30 14 52"/>
+      </g>
+      <g fill="#5b8fd0"><path d="M272 140 q-5 8 0 11 q5 -3 0 -11z"/><path d="M281 156 q-4 7 0 9 q4 -2 0 -9z"/></g>
+      <!-- fold -->
+      <text x="336" y="134" font-family="Kalam, cursive" font-size="20" fill="#21242f" text-anchor="middle">fold</text>
+      <path d="M302 168 q34 -28 70 -6" stroke="#e06b26" stroke-width="2.6"/><path d="M360 152 l13 10 l-15 5" stroke="#e06b26" stroke-width="2.6"/>
+      <!-- packed-light robot -->
+      <g stroke="#21242f" stroke-width="2.4">
+        <path d="M500 134 v-14"/><circle cx="500" cy="114" r="7" fill="#e06b26" stroke="#e06b26"/>
+        <rect x="456" y="134" width="88" height="70" rx="11" fill="url(#hatchBlue)"/>
+        <circle cx="482" cy="162" r="6" fill="#21242f"/><circle cx="518" cy="162" r="6" fill="#21242f"/>
+        <path d="M486 182 q14 10 28 0"/>
+        <rect x="466" y="212" width="70" height="76" rx="9" fill="url(#hatchBlue)"/>
+        <circle cx="501" cy="252" r="6" stroke="#2d6bb1" stroke-width="2"/>
+        <path d="M466 228 c -14 -6 -22 -20 -36 -36"/><path d="M536 228 c 14 10 16 28 12 46"/>
+      </g>
+      <g stroke="#2d6bb1" stroke-width="2.4">
+        <path d="M402 186 v-12 h26 v12"/>
+        <rect x="388" y="186" width="54" height="98" rx="7" fill="url(#hatchBlue)"/>
+        <path d="M406 194 v82 M424 194 v82" stroke-width="1.8"/>
+        <circle cx="398" cy="290" r="5" fill="#fff"/><circle cx="432" cy="290" r="5" fill="#fff"/>
+      </g>
+      <path d="M0 296 H640" stroke="#9a9da5" stroke-width="1.6"/>
+      <text x="118" y="328" font-family="Kalam, cursive" font-size="22" font-weight="700" fill="#e06b26" text-anchor="middle">the whole history</text>
+      <text x="470" y="328" font-family="Kalam, cursive" font-size="22" font-weight="700" fill="#2d6bb1" text-anchor="middle">packed light</text>
+    </svg>
+  </header>
+
+  <div class="paper-title">
+    <h1>Pack Light, CarryOn: Building Object-Oriented Context for Long-Horizon Agents</h1>
+    <p class="authors">
+      <a href="https://github.com/Ethannju">Yuchen Lu</a><sup>1</sup>,&ensp;
+      <a href="https://cseweb.ucsd.edu/~jmcauley/">Julian McAuley</a><sup>1</sup>,&ensp;
+      <span style="white-space:nowrap">Lei Zhang<sup>1,*</sup></span>
+    </p>
+    <p class="affil"><sup>1</sup>University of California San Diego</p>
+    <p class="corr"><sup>*</sup>corresponding author</p>
+    <div class="buttons">
+      <!-- Paper: set href to the arXiv abs page and drop class "soon" once it is live. -->
+      <span class="btn soon" aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+        Paper <small>arXiv soon</small></span>
+      <a class="btn" href="https://github.com/Ethannju/carryon">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+        Code</a>
+      <a class="btn" href="#video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+        Video</a>
+    </div>
+  </div>
+
+  <section id="video">
+    <p class="step">a two-minute overview</p>
+    <div class="video-frame">
+      <video controls playsinline preload="metadata" poster="static/images/video-poster.jpg">
+        <source src="static/videos/carryon-demo.mp4" type="video/mp4">
+        Your browser cannot play this video. <a href="static/videos/carryon-demo.mp4">Download it</a>.
+      </video>
+    </div>
+  </section>
+
+  <section>
+    <p class="step">1 / 4 · The idea</p>
+    <h2>Let <span class="hl">task objects carry the progress.</span></h2>
+    <p class="lead">A long task leaves its progress in the environment, yet the agent keeps re-reading how it got there.
+    CarryOn builds the context around <b class="blue">reusable task objects</b> instead, so the agent carries just three things.</p>
+    <div class="things">
+      <div class="thing cc"><h3><span class="n">1</span>Where the work is</h3><p>Continuation carriers point to task objects, such as a file or an app state.</p></div>
+      <div class="thing ec"><h3><span class="n">2</span>What's left to do</h3><p>Execution context keeps goals, constraints and open issues.</p></div>
+      <div class="thing tail"><h3><span class="n">3</span>Latest steps</h3><p>The live tail keeps the steps since the last fold.</p></div>
+    </div>
+    <div class="sheet"><img src="static/images/fold-example.png" alt="Two OSWorld 2.0 tasks before and after a fold" loading="lazy"></div>
+    <p class="note"><b>Folding with task objects on OSWorld 2.0.</b> The presentation and the report carry the finished edits, while
+    remaining constraints and calculations stay explicit. Active context drops from 42.4K to 14.4K tokens (−66.0%) and from
+    58.4K to 23.5K tokens (−59.7%).</p>
+  </section>
+
+  <section>
+    <p class="step">2 / 4 · How it works</p>
+    <h2>CarryOn runs <span class="hl">alongside the agent.</span></h2>
+    <p class="lead">The agent keeps its usual loop and reads a compact context view. Every so often, CarryOn tracks
+    reusable progress, checks it against the environment, and commits one validated fold.</p>
+    <div class="sheet"><img src="assets/overview.png" alt="Overview of the CarryOn framework" loading="lazy"></div>
+  </section>
+
+  <section>
+    <p class="step">3 / 4 · Results</p>
+    <h2><span class="hl">Higher scores,</span> with about half the tokens.</h2>
+    <p class="fine" style="margin:-8px 0 26px">same agent model (Claude Opus 4.7), with and without CarryOn</p>
+    <div class="bench">
+      <div class="panel">
+        <h3>OSWorld 2.0</h3><p class="what">long, real computer tasks · partial score (%)</p>
+        <div class="chart">
+          <div>
+            <div class="bars"><div class="bar" style="height:146px"><span>43.9</span></div><div class="bar co" style="height:166px"><span>49.7</span></div></div>
+            <div class="xlab"><div>without</div><div>with CarryOn</div></div>
+          </div>
+          <div class="calls">
+            <div class="gain"><span class="hl">+5.8 points</span></div>
+            <p>tokens −52%<small>40.1M → 19.3M per task</small></p>
+            <p>cost −36%<small>$36.83 → $23.62 per task</small></p>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>BrowseComp-Plus</h3><p class="what">long web research · accuracy (%)</p>
+        <div class="chart">
+          <div>
+            <div class="bars"><div class="bar" style="height:163px"><span>49</span></div><div class="bar co" style="height:187px"><span>56</span></div></div>
+            <div class="xlab"><div>without</div><div>with CarryOn</div></div>
+          </div>
+          <div class="calls">
+            <div class="gain"><span class="hl">+7 points</span></div>
+            <p>tokens −23%<small>1.56M → 1.20M per task</small></p>
+            <p>cost −7%<small>$1.89 → $1.76 per task</small></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet"><img src="assets/osworld-results.png" alt="Task performance on OSWorld 2.0" loading="lazy"></div>
+    <p class="note">Task performance on OSWorld 2.0. * Reproduced with the official benchmark and API.</p>
+  </section>
+
+  <section>
+    <p class="step">4 / 4 · Long tasks</p>
+    <h2>The context <span class="hl">stays small,</span> even on very long tasks.</h2>
+    <p class="lead">Without CarryOn, the agent's context keeps growing with every turn. With it, the context levels off,
+    so the longer the task runs, the more it saves.</p>
+    <div class="sheet"><img src="assets/context-and-cost.png" alt="Context size and cumulative cost over agent turns" loading="lazy"></div>
+    <p class="note">Input context stays near 65K tokens while the baseline keeps growing; cost is 34.1% lower by turn 500.</p>
+  </section>
+
+  <!-- BibTeX: add a citation section here once the arXiv version is up. -->
+
+  <div class="takeaway">
+    <div>
+      <p class="big">An agent doesn't need to remember every step.</p>
+      <p class="big">Just <span class="blue">where the work is,</span><br>and <span class="orange">what's left to do.</span></p>
+    </div>
+    <!-- robot with a packed suitcase, after the video's last slide -->
+    <svg class="packed" viewBox="0 0 260 230" fill="none" stroke="#21242f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A robot standing next to a small suitcase">
+      <text x="30" y="26" font-family="Kalam, cursive" font-size="20" fill="#2d6bb1" stroke="none" transform="rotate(-4 30 26)">packed light!</text>
+      <path d="M58 98 h26 M62 98 v-10 h18 v10" stroke="#2d6bb1"/>
+      <rect x="44" y="98" width="54" height="104" rx="9" fill="url(#hatchBlue)" stroke="#2d6bb1"/>
+      <path d="M62 104 v92 M80 104 v92" stroke="#2d6bb1" stroke-width="1.6"/>
+      <circle cx="56" cy="210" r="6" fill="#fff" stroke="#2d6bb1"/><circle cx="86" cy="210" r="6" fill="#fff" stroke="#2d6bb1"/>
+      <path d="M172 48 v-14"/><circle cx="172" cy="30" r="6" fill="#e06b26" stroke="#e06b26"/>
+      <rect x="132" y="48" width="80" height="64" rx="12" fill="#fff"/>
+      <circle cx="156" cy="76" r="7" fill="#21242f"/><circle cx="188" cy="76" r="7" fill="#21242f"/>
+      <path d="M160 94 q12 9 24 0"/>
+      <rect x="140" y="118" width="64" height="86" rx="8" fill="url(#hatch)"/>
+      <circle cx="172" cy="160" r="7" stroke="#2d6bb1" stroke-width="2"/>
+      <path d="M140 140 C 124 150, 112 140, 98 122"/>
+      <path d="M204 140 c 14 10, 18 30, 14 50"/>
+      <path d="M20 216 h220" stroke="#9a9da5" stroke-width="1.6"/>
+    </svg>
+  </div>
+
+  <footer>
+    <span class="brand">CarryOn</span>
+    <span>Pack Light, CarryOn: Building Object-Oriented Context for Long-Horizon Agents · <a href="https://github.com/Ethannju/carryon">github.com/Ethannju/carryon</a></span>
+  </footer>
+</div>
+</body>
+</html>
