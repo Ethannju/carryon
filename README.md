@@ -2,8 +2,7 @@
 
 <p align="center">
   <a href="https://ethannju.github.io/carryon/"><img src="https://img.shields.io/badge/Project-Page-2d6bb1.svg" alt="Project Page"></a>
-  <!-- arXiv: replace the next badge once available, e.g. <a href="https://arxiv.org/abs/XXXX.XXXXX"><img src="https://img.shields.io/badge/arXiv-XXXX.XXXXX-b31b1b.svg" alt="arXiv"></a> -->
-  <img src="https://img.shields.io/badge/arXiv-coming%20soon-lightgrey.svg" alt="arXiv: coming soon">
+  <a href="https://arxiv.org/abs/2610.18784"><img src="https://img.shields.io/badge/arXiv-2610.18784-b31b1b.svg" alt="arXiv"></a>
 </p>
 
 
@@ -35,3 +34,14 @@ growing past 200K tokens, while CarryOn's stays near 65K; by turn 500 the cumula
 ## Code
 
 The code will be released after the review process.
+
+## Citation
+
+```bibtex
+@article{lu2026carryon,
+  title   = {Pack Light, CarryOn: Building Object-Oriented Context for Long-Horizon Agents},
+  author  = {Lu, Yuchen and McAuley, Julian and Zhang, Lei},
+  journal = {arXiv preprint arXiv:2610.18784},
+  year    = {2026}
+}
+```
