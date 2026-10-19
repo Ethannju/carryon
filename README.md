@@ -3,6 +3,7 @@
 <p align="center">
   <a href="https://ethannju.github.io/carryon/"><img src="https://img.shields.io/badge/Project-Page-2d6bb1.svg" alt="Project Page"></a>
   <a href="https://arxiv.org/abs/2610.18784"><img src="https://img.shields.io/badge/arXiv-2610.18784-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://huggingface.co/papers/2610.18784"><img src="https://img.shields.io/badge/Hugging%20Face-Paper-ffd21e.svg?logo=huggingface" alt="Hugging Face Paper"></a>
 </p>
 
 
